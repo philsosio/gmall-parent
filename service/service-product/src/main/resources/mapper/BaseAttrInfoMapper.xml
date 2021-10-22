@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atguigu.gmall.product.mapper.BaseAttrInfoMapper">
+
+    <resultMap id="BaseAttrInfoMap" type="com.atguigu.gmall.model.product.BaseAttrInfo" autoMapping="true">
+        <id column="id" property="id"></id>
+        <collection property="attrValueList" ofType="com.atguigu.gmall.model.product.BaseAttrValue" autoMapping="true">
+            <id property="id" column="base_attr_value_id"></id>
+        </collection>
+    </resultMap>
+
+    <select id="selectBaseAttrInfoByCategoryId" resultMap="BaseAttrInfoMap">
+        SELECT
+            t1.id,
+            t1.attr_name,
+            t1.category_id,
+            t1.category_level,
+            t2.id AS base_attr_value_id,
+            t2.value_name,
+            t2.attr_id
+        FROM
+            base_attr_info t1
+            INNER JOIN base_attr_value t2 ON t1.id = t2.attr_id
+        <where>
+            <if test="category1 != null and category1 != 0">
+                OR ( t1.category_id = #{category1} AND t1.category_level = 1 )
+            </if>
+            <if test="category2 != null and category2 != 0">
+                OR ( t1.category_id = #{category2} AND t1.category_level = 2 )
+            </if>
+            <if test="category3 != null and category3 != 0">
+                OR ( t1.category_id = #{category3} AND t1.category_level = 3 )
+            </if>
+        </where>
+    </select>
+
+    <select id="selectBaseAttrInfoBySkuId" resultMap="BaseAttrInfoMap">
+        SELECT
+            t1.id,
+            t1.attr_name,
+            t1.category_id,
+            t1.category_level,
+            t2.id as base_attr_value_id,
+            t2.value_name,
+            t2.attr_id
+        FROM
+            base_attr_info t1
+            INNER JOIN base_attr_value t2 ON t1.id = t2.attr_id
+            INNER JOIN sku_attr_value t3 ON t1.id = t3.attr_id
+            AND t2.id = t3.value_id
+            WHERE t3.sku_id = #{skuId}
+    </select>
+</mapper>
